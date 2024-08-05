@@ -1,0 +1,8 @@
+venv
+.databricks/.databricks.env
+.vscode/settings.json
+.databricks/project.json
+
+.databricks
+typings/*
+sample/10K.github.json.bz2
