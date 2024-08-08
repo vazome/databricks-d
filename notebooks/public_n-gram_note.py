@@ -9,6 +9,7 @@
 # MAGIC
 
 # COMMAND ----------
+
 from databricks.connect import DatabricksSession
 spark = DatabricksSession.builder.getOrCreate()
 
@@ -16,8 +17,10 @@ import pyspark.sql.functions as F
 import string
 
 context = dbutils.notebook.entry_point.getDbutils().notebook().getContext()
-username = context.userName().get()
+username = str(context.userName().get())
+
 # COMMAND ----------
+
 # Read json from the compressed archive
 df = spark.read.json("/Volumes/databricks_learn/schema_learn/sample_data/ngram/10K.github.json.bz2")
 
@@ -34,8 +37,6 @@ df = df.withColumn("array_words", F.split(df.message, "\s+"))
 
 # Remove empty strings
 df = df.withColumn("array_words", F.array_remove(df.array_words, ""))
-
-display(df)
 
 # COMMAND ----------
 
@@ -84,9 +85,7 @@ df_top_ngrams = df_top_ngrams.groupBy(df_top_ngrams.name).agg(
 top_ngram_per_author_name = "top_ngram_per_author"
 # Store it in catalog
 json_doc_catalog = df_top_ngrams.write.json(f"/Volumes/databricks_learn/schema_learn/sample_data/{top_ngram_per_author_name}", mode="overwrite")
-# Store in via VScode Databricks Connect in .ide folder in remote user workspace.
-json_doc_ide = df_top_ngrams.write.json(f"./sample/{top_ngram_per_author_name}", mode="overwrite")
+# Store in via VSCode Databricks Connect in .ide folder in remote user workspace (of executed from VSCode)
+#json_doc_ide = df_top_ngrams.write.json(f"./sample/{top_ngram_per_author_name}", mode="overwrite")
 # Store it in Databricks user workspace connected to Git repo
-json_doc_repo = df_top_ngrams.write.json(f"/Workspace/Users/{username}/databricks-d/sample/{top_ngram_per_author_name}", mode="overwrite")
-
-display(df_top_ngrams)
+json_doc_repo = df_top_ngrams.write.json(f"/Workspace/Users/${username}/databricks-info-export/ngrams/{top_ngram_per_author_name}", mode="overwrite")
